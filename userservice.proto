@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package userService;
+package userservice;
 
 message ActivateUserRequest {
   string userId = 1;
