@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package userService;
+
+message ActivateUserRequest {
+  string userId = 1;
+}
+
+message ActivateUserResponse {
+  bool status = 1;
+  string error = 2;
+}
+
+message LoginRequest {
+  string password = 1;
+  oneof userCredential {
+    string username = 2;
+    string email = 3;
+  }
+}
+
+message LoginResponse {
+  enum LoginStatus {
+    SUCCESS = 0;
+    INVALID_CREDENTIALS = 1;
+    NOT_ACTIVATED = 2;
+  }
+}
+
+service UserService {
+  rpc ActivateUser(ActivateUserRequest) returns (ActivateUserResponse) {}
+  rpc LoginUser(LoginRequest) returns (LoginResponse) {}
+}
+
