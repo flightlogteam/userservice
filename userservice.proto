@@ -25,6 +25,7 @@ message LoginResponse {
     INVALID_CREDENTIALS = 1;
     NOT_ACTIVATED = 2;
   }
+  LoginStatus status = 1;
 }
 
 service UserService {
