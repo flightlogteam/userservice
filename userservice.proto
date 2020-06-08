@@ -26,6 +26,8 @@ message LoginResponse {
     NOT_ACTIVATED = 2;
   }
   LoginStatus status = 1;
+  string userId = 2;
+  string role = 3;
 }
 
 service UserService {
