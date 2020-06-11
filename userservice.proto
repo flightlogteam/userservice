@@ -30,8 +30,33 @@ message LoginResponse {
   string role = 3;
 }
 
+message CreateUserRequest {
+  string username = 1;
+  string email = 2;
+  string firstname = 3;
+  string lastname = 4;
+  enum PrivacyLevel {
+    PUBLIC = 0;
+    PROTECTED = 1;
+    PRIVATE = 2;
+  }
+  PrivacyLevel level = 5;
+}
+
+message CreateUserResponse {
+  enum CreationStatus {
+    SUCCESS = 0;
+    EMAIL_EXISTS = 1;
+    USERNAME_EXISTS = 2;
+  }
+  CreationStatus status = 1;
+}
+
+
+
 service UserService {
   rpc ActivateUser(ActivateUserRequest) returns (ActivateUserResponse) {}
   rpc LoginUser(LoginRequest) returns (LoginResponse) {}
+  rpc RegisterUser(CreateUserRequest) returns (CreateUserResponse) {}
 }
 
