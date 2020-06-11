@@ -41,6 +41,7 @@ message CreateUserRequest {
     PRIVATE = 2;
   }
   PrivacyLevel level = 5;
+  string password = 6;
 }
 
 message CreateUserResponse {
