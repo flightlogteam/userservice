@@ -53,7 +53,7 @@ func (s *GrpcServer) LoginUser(_ context.Context, loginRequest *userservice.Logi
 	login, err := s.userService.Login(loginRequest.GetUsername(), loginRequest.GetEmail(), loginRequest.GetPassword())
 	loginResponse := userservice.LoginResponse{}
 	if err != nil {
-		userError := common.UserError(err)
+		userError, _ := err.(*common.UserError)
 		switch userError.ErrorType {
 		case common.BAD_CREDENTIALS_ERROR:
 			loginResponse.Status = userservice.LoginResponse_INVALID_CREDENTIALS
@@ -61,7 +61,7 @@ func (s *GrpcServer) LoginUser(_ context.Context, loginRequest *userservice.Logi
 		case common.USER_DOES_NOT_EXISTS_TYPE:
 			loginResponse.Status = userservice.LoginResponse_NOT_ACTIVATED
 			break
-		case common.BAD_CREDENTIALS_ERROR:
+		case common.VALIDATION_ERROR_TYPE:
 			loginResponse.Status = userservice.LoginResponse_INVALID_CREDENTIALS
 			break
 		}
@@ -76,42 +76,49 @@ func (s *GrpcServer) LoginUser(_ context.Context, loginRequest *userservice.Logi
 
 // RegisterUser creates a new user in the database
 func (s *GrpcServer) RegisterUser(_ context.Context, createUserRequest *userservice.CreateUserRequest) (*userservice.CreateUserResponse, error) {
-	user := user.User{
-		Givenname:  createUserRequest.GetFirstname(),
-		Familyname: createUserRequest.GetLastname(),
-		Credentials: user.Credentials{
-			PasswordHash: createUserRequest.GetPassword(),
-		},
-		Privacy:  createUserRequest.GetLevel(),
-		Username: createUserRequest.GetUsername(),
-		Email:    createUserRequest.GetEmail(),
+	response := userservice.CreateUserResponse{}
+	usr := user.User{
+		Givenname:   createUserRequest.GetFirstname(),
+		Familyname:  createUserRequest.GetLastname(),
+		Privacy:     mapPrivacyLevel(createUserRequest.GetLevel()),
+		Credentials: make([]user.Credentials, 1),
+		Username:    createUserRequest.GetUsername(),
+		Email:       createUserRequest.GetEmail(),
 	}
-	id, err := s.userService.Create(user)
-
-	userStatus := 0
-	userError := common.UserError(err)
-	errorMessage := ""
-
-	switch userError.ErrorType {
-	case common.USER_DOES_NOT_EXISTS_TYPE:
-		userStatus = userservice.CreateUserResponse_USERNAME_EXISTS
-		break
-	case common.USER_EXISTS_TYPE:
-		userStatus = userservice.CreateUserResponse_EMAIL_EXISTS
-		break
-	case common.VALIDATION_ERROR_TYPE:
-		userStatus = userservice.CreateUserResponse_INVALID_DATA
-		break
+	usr.Credentials[0] = user.Credentials{
+		PasswordHash: createUserRequest.GetPassword(),
 	}
+	_, err := s.userService.Create(&usr)
 
-	if err == nil {
-		userStatus = userservice.CreateUserResponse_SUCCESS
+	userError, _ := err.(*common.UserError)
+	if err != nil {
+		switch userError.ErrorType {
+		case common.USER_DOES_NOT_EXISTS_TYPE:
+			response.Status = userservice.CreateUserResponse_USERNAME_EXISTS
+			break
+		case common.USER_EXISTS_TYPE:
+			response.Status = userservice.CreateUserResponse_EMAIL_EXISTS
+			break
+		case common.VALIDATION_ERROR_TYPE:
+			response.Status = userservice.CreateUserResponse_INVALID_DATA
+			break
+		}
+		response.ErrorMessage = err.Error()
 	} else {
-		errorMessage = err.Error()
+		response.Status = userservice.CreateUserResponse_SUCCESS
 	}
 
-	return &userservice.CreateUserResponse{
-		Status:       userStatus,
-		ErrorMessage: errorMessage,
-	}, err
+	return &response, err
+}
+
+func mapPrivacyLevel(level userservice.CreateUserRequest_PrivacyLevel) user.PrivacyLevel {
+	switch level {
+	case userservice.CreateUserRequest_PRIVATE:
+		return user.PrivateLevel
+	case userservice.CreateUserRequest_PUBLIC:
+		return user.PublicLevel
+	case userservice.CreateUserRequest_PROTECTED:
+		return user.ProtectedLevel
+	}
+	return user.ProtectedLevel
 }
