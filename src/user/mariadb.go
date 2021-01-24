@@ -13,9 +13,19 @@ type MariadbRepo struct {
 	context *gorm.DB
 }
 
+func (r *MariadbRepo) UserByUsername(username string) (*User, error) {
+	var user User
+	result := r.context.
+		Preload("Credentials").
+		Where("username = ?", username).First(&user)
+	return &user, result.Error
+}
+
 func (r *MariadbRepo) UserByEmail(email string) (*User, error) {
 	var user User
-	result := r.context.Where("email = ?", email).First(&user)
+	result := r.context.
+		Preload("Credentials").
+		Where("email = ?", email).First(&user)
 	return &user, result.Error
 }
 

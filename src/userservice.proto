@@ -1,6 +1,7 @@
 syntax = "proto3";
 
-package userservice;
+package usergrpc;
+option go_package="usergrpc/userservice";
 
 message ActivateUserRequest {
   string userId = 1;
@@ -62,4 +63,3 @@ service UserService {
   rpc LoginUser(LoginRequest) returns (LoginResponse) {}
   rpc RegisterUser(CreateUserRequest) returns (CreateUserResponse) {}
 }
-

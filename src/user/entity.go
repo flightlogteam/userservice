@@ -7,16 +7,30 @@ import (
 
 // User models a db user
 type User struct {
-	ID         string       `gorm:"primaryKey;column:id"`
-	Givenname  string       `gorm:"column:givenname"`
-	Familyname string       `gorm:"column:familyname"`
-	Email      string       `gorm:"column:email"`
-	Active     Bit          `gorm:"column:active"`
-	Username   string       `gorm:"column:username"`
-	Privacy    PrivacyLevel `gorm:"column:privacylevel"`
-	UpdatedAt  *time.Time   `gorm:"column:updatedat;type:time"`
-	CreatedAt  *time.Time   `gorm:"column:createdat;type:time"`
-	DeletedAt  *time.Time   `gorm:"column:deletedat;type:time"`
+	ID          string        `gorm:"primaryKey;column:id"`
+	Givenname   string        `gorm:"column:givenname"`
+	Familyname  string        `gorm:"column:familyname"`
+	Email       string        `gorm:"column:email"`
+	Active      Bit           `gorm:"column:active"`
+	Username    string        `gorm:"column:username"`
+	Credentials []Credentials `gorm:"foreignKey:UserId"`
+	Privacy     PrivacyLevel  `gorm:"column:privacylevel"`
+	UpdatedAt   *time.Time    `gorm:"column:updatedat;type:time"`
+	CreatedAt   *time.Time    `gorm:"column:createdat;type:time"`
+	DeletedAt   *time.Time    `gorm:"column:deletedat;type:time"`
+}
+
+type Credentials struct {
+	ID           int        `gorm:"primaryKey;column:id"`
+	UserId       string     `gorm:"column:userId"`
+	PasswordHash string     `gorm:"column:passwordHash"`
+	UpdatedAt    *time.Time `gorm:"column:updatedat;type:time"`
+	CreatedAt    *time.Time `gorm:"column:createdat;type:time"`
+	DeletedAt    *time.Time `gorm:"column:deletedat;type:time"`
+}
+
+func (Credentials) TableName() string {
+	return "Credentials"
 }
 
 func (User) TableName() string {

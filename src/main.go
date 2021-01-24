@@ -1,29 +1,38 @@
 package main
 
-import "fmt"
-import "userservice/user"
+import (
+	"log"
+	"net"
+	"userservice/server"
+	"userservice/user"
+	"userservice/usergrpc/userservice"
+
+	"google.golang.org/grpc"
+)
 
 func main() {
 	repo, err := user.NewRepository("root", "pass", "localhost", "3306", "flightloguser")
 
 	if err != nil {
-		fmt.Errorf("Cannot create connection %v", err)
+		log.Fatalf("cannot create connection %v", err)
 		return
 	}
 
-	/*res, err := repo.Create(&user.User{
-		Givenname:  "Martin",
-		Familyname: "Klingenberg",
-		Email:      "martin@klingenberg.as",
-		Active:     true,
-		Privacy:    0,
-	})*/
-
-	res, err := repo.UserByEmail("martin@klingenberg.as")
+	listener, err := net.Listen("tcp", ":61226")
 
 	if err != nil {
-		fmt.Errorf("Unable to create user: %v", err)
-		return
+		log.Fatalf("Unable to listen to spcified port: %v", err)
 	}
-	fmt.Println("Works", res)
+
+	userService := user.NewUserService(repo)
+
+	userserver := server.NewGrpcServer(userService)
+	grpcServer := grpc.NewServer()
+	userservice.RegisterUserServiceServer(grpcServer, &userserver)
+
+	log.Println("starting server...")
+
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("unable to start server: %v", err)
+	}
 }

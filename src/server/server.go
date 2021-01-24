@@ -1,0 +1,117 @@
+package server
+
+import (
+	"context"
+	"userservice/common"
+	"userservice/user"
+	"userservice/usergrpc/userservice"
+)
+
+// NewGrpcServer creates a new GrpcServer instance
+func NewGrpcServer(userservice user.Service) GrpcServer {
+	return GrpcServer{
+		userService: userservice,
+	}
+}
+
+// GrpcServer represents a server implementation
+// it is in many ways an adapter to the core of the architecture
+type GrpcServer struct {
+	userservice.UnimplementedUserServiceServer
+	userService user.Service
+}
+
+// ActivateUser activates a user in the database after a user has clicked activation link
+func (s *GrpcServer) ActivateUser(_ context.Context, activationRequest *userservice.ActivateUserRequest) (*userservice.ActivateUserResponse, error) {
+	user, err := s.userService.UserById(activationRequest.UserId)
+	if err != nil {
+		return &userservice.ActivateUserResponse{
+			Status: false,
+			Error:  err.Error(),
+		}, err
+	}
+
+	user.Active = true
+
+	err = s.userService.Update(user)
+
+	if err != nil {
+		return &userservice.ActivateUserResponse{
+			Status: false,
+			Error:  err.Error(),
+		}, err
+	}
+
+	return &userservice.ActivateUserResponse{
+		Status: true,
+	}, nil
+
+}
+
+// LoginUser verifies a user login request for the api-gateway
+func (s *GrpcServer) LoginUser(_ context.Context, loginRequest *userservice.LoginRequest) (*userservice.LoginResponse, error) {
+	login, err := s.userService.Login(loginRequest.GetUsername(), loginRequest.GetEmail(), loginRequest.GetPassword())
+	loginResponse := userservice.LoginResponse{}
+	if err != nil {
+		userError := common.UserError(err)
+		switch userError.ErrorType {
+		case common.BAD_CREDENTIALS_ERROR:
+			loginResponse.Status = userservice.LoginResponse_INVALID_CREDENTIALS
+		case common.SQL_ERROR_TYPE:
+		case common.USER_DOES_NOT_EXISTS_TYPE:
+			loginResponse.Status = userservice.LoginResponse_NOT_ACTIVATED
+			break
+		case common.BAD_CREDENTIALS_ERROR:
+			loginResponse.Status = userservice.LoginResponse_INVALID_CREDENTIALS
+			break
+		}
+	} else {
+		loginResponse.Status = userservice.LoginResponse_SUCCESS
+		loginResponse.UserId = login.ID
+		loginResponse.Role = "default"
+	}
+	return &loginResponse, err
+
+}
+
+// RegisterUser creates a new user in the database
+func (s *GrpcServer) RegisterUser(_ context.Context, createUserRequest *userservice.CreateUserRequest) (*userservice.CreateUserResponse, error) {
+	user := user.User{
+		Givenname:  createUserRequest.GetFirstname(),
+		Familyname: createUserRequest.GetLastname(),
+		Credentials: user.Credentials{
+			PasswordHash: createUserRequest.GetPassword(),
+		},
+		Privacy:  createUserRequest.GetLevel(),
+		Username: createUserRequest.GetUsername(),
+		Email:    createUserRequest.GetEmail(),
+	}
+	id, err := s.userService.Create(user)
+
+	userStatus := 0
+	userError := common.UserError(err)
+	errorMessage := ""
+
+	switch userError.ErrorType {
+	case common.USER_DOES_NOT_EXISTS_TYPE:
+		userStatus = userservice.CreateUserResponse_USERNAME_EXISTS
+		break
+	case common.USER_EXISTS_TYPE:
+		userStatus = userservice.CreateUserResponse_EMAIL_EXISTS
+		break
+	case common.VALIDATION_ERROR_TYPE:
+		userStatus = userservice.CreateUserResponse_INVALID_DATA
+		break
+	}
+
+	if err == nil {
+		userStatus = userservice.CreateUserResponse_SUCCESS
+	} else {
+		errorMessage = err.Error()
+	}
+
+	return &userservice.CreateUserResponse{
+		Status:       userStatus,
+		ErrorMessage: errorMessage,
+	}, err
+}

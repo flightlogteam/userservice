@@ -11,6 +11,7 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
+// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
 // UserServiceClient is the client API for UserService service.
@@ -32,7 +33,7 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 
 func (c *userServiceClient) ActivateUser(ctx context.Context, in *ActivateUserRequest, opts ...grpc.CallOption) (*ActivateUserResponse, error) {
 	out := new(ActivateUserResponse)
-	err := c.cc.Invoke(ctx, "/userservice.UserService/ActivateUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/usergrpc.UserService/ActivateUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +42,7 @@ func (c *userServiceClient) ActivateUser(ctx context.Context, in *ActivateUserRe
 
 func (c *userServiceClient) LoginUser(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	out := new(LoginResponse)
-	err := c.cc.Invoke(ctx, "/userservice.UserService/LoginUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/usergrpc.UserService/LoginUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +51,7 @@ func (c *userServiceClient) LoginUser(ctx context.Context, in *LoginRequest, opt
 
 func (c *userServiceClient) RegisterUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
 	out := new(CreateUserResponse)
-	err := c.cc.Invoke(ctx, "/userservice.UserService/RegisterUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/usergrpc.UserService/RegisterUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +91,7 @@ type UnsafeUserServiceServer interface {
 }
 
 func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
-	s.RegisterService(&_UserService_serviceDesc, srv)
+	s.RegisterService(&UserService_ServiceDesc, srv)
 }
 
 func _UserService_ActivateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -103,7 +104,7 @@ func _UserService_ActivateUser_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userservice.UserService/ActivateUser",
+		FullMethod: "/usergrpc.UserService/ActivateUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).ActivateUser(ctx, req.(*ActivateUserRequest))
@@ -121,7 +122,7 @@ func _UserService_LoginUser_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userservice.UserService/LoginUser",
+		FullMethod: "/usergrpc.UserService/LoginUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).LoginUser(ctx, req.(*LoginRequest))
@@ -139,7 +140,7 @@ func _UserService_RegisterUser_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/userservice.UserService/RegisterUser",
+		FullMethod: "/usergrpc.UserService/RegisterUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).RegisterUser(ctx, req.(*CreateUserRequest))
@@ -147,8 +148,11 @@ func _UserService_RegisterUser_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-var _UserService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "userservice.UserService",
+// UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var UserService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "usergrpc.UserService",
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

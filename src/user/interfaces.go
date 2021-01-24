@@ -17,10 +17,12 @@ type Repository interface {
 	Writer
 	// UserExists checks if there is any row with a matching email or username
 	UserExists(email string, username string) (string, error)
+	UserByUsername(username string) (*User, error)
 }
 
-// Services define user service layer
+// Service define user service layer
 type Service interface {
 	Reader
 	Writer
+	Login(username string, email string, password string) (*User, error)
 }
