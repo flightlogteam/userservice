@@ -56,6 +56,14 @@ func (u *UserService) Create(user *User) (string, error) {
 		return "", common.NewUserError(fmt.Sprintf("%s already exists", param), common.VALIDATION_ERROR_TYPE)
 	}
 
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Credentials[0].PasswordHash), bcrypt.DefaultCost)
+
+	if err != nil {
+		return "", common.NewUserError(fmt.Sprintf("Unable to create password hash: %v", err.Error()), common.INTERNAL_SERVER_ERROR_TYPE)
+	}
+
+	user.Credentials[0].PasswordHash = string(hash)
+
 	userId, err := u.repo.Create(user)
 
 	if err != nil {

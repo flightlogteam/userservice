@@ -19,9 +19,10 @@ func (u *UserError) Error() string {
 }
 
 const (
-	VALIDATION_ERROR_TYPE     UserErrorType = 1
-	SQL_ERROR_TYPE            UserErrorType = 2
-	USER_EXISTS_TYPE          UserErrorType = 3
-	USER_DOES_NOT_EXISTS_TYPE UserErrorType = 4
-	BAD_CREDENTIALS_ERROR     UserErrorType = 5
+	VALIDATION_ERROR_TYPE      UserErrorType = 1
+	SQL_ERROR_TYPE             UserErrorType = 2
+	USER_EXISTS_TYPE           UserErrorType = 3
+	USER_DOES_NOT_EXISTS_TYPE  UserErrorType = 4
+	BAD_CREDENTIALS_ERROR      UserErrorType = 5
+	INTERNAL_SERVER_ERROR_TYPE UserErrorType = 6
 )

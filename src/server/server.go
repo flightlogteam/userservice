@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"log"
 	"userservice/common"
 	"userservice/user"
 	"userservice/usergrpc/userservice"
@@ -76,6 +77,7 @@ func (s *GrpcServer) LoginUser(_ context.Context, loginRequest *userservice.Logi
 
 // RegisterUser creates a new user in the database
 func (s *GrpcServer) RegisterUser(_ context.Context, createUserRequest *userservice.CreateUserRequest) (*userservice.CreateUserResponse, error) {
+	log.Println("Create user request")
 	response := userservice.CreateUserResponse{}
 	usr := user.User{
 		Givenname:   createUserRequest.GetFirstname(),
