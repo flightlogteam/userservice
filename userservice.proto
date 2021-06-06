@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package usergrpc;
-option go_package="usergrpc/userservice";
+option go_package="grpc/userservice";
 
 message ActivateUserRequest {
   string userId = 1;

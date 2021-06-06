@@ -3,9 +3,10 @@ package server
 import (
 	"context"
 	"log"
-	"userservice/common"
-	"userservice/user"
-	"userservice/usergrpc/userservice"
+
+	"github.com/flightlogteam/userservice/grpc/userservice"
+	"github.com/flightlogteam/userservice/src/common"
+	"github.com/flightlogteam/userservice/src/user"
 )
 
 // NewGrpcServer creates a new GrpcServer instance

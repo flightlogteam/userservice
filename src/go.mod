@@ -1,4 +1,4 @@
-module userservice
+module github.com/flightlogteam/userservice/src
 
 go 1.14
 
