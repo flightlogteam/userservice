@@ -13,23 +13,26 @@ import (
 )
 
 func main() {
+	rcpPort := ":61226"
 	config := getConfiguration()
 
 	if !config.IsValidConfiguration() {
-		log.Fatalf("No valid database configuration present")
+		log.Fatalf("No valid database configuration present \n")
 	}
 
 	repo, err := user.NewRepository(config.username, config.password, config.hostname, config.port, config.database)
 
 	if err != nil {
-		log.Fatalf("cannot create connection %v", err)
+		log.Fatalf("cannot create connection to database: %v, on hostname %v, with user %v. Config gave following error:\n %v \n", config.database, config.hostname, config.username, err)
 		return
 	}
 
-	listener, err := net.Listen("tcp", ":61226")
+	log.Printf("Connected to database %v, with user %v \n", config.database, config.username)
+
+	listener, err := net.Listen("tcp", rcpPort)
 
 	if err != nil {
-		log.Fatalf("Unable to listen to spcified port: %v", err)
+		log.Fatalf("Unable to listen to spcified port: %v \n", err)
 	}
 
 	userService := user.NewUserService(repo)
@@ -38,11 +41,12 @@ func main() {
 	grpcServer := grpc.NewServer()
 	userservice.RegisterUserServiceServer(grpcServer, &userserver)
 
-	log.Println("starting server...")
+	log.Printf("starting server on port %v...", rcpPort)
 
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("unable to start server: %v", err)
 	}
+
 }
 
 func getConfiguration() databaseConfiguration {

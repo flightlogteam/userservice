@@ -7,7 +7,13 @@ RUN apk update && apk add --no-cache git
 COPY src/ /src
 RUN ls src
 WORKDIR /src
+
+# Enables watch functionality
+RUN go install github.com/mitranim/gow@latest
+
 RUN go build -o /userservice
+
+CMD ["gow", "run", "."]
 
 #USER appuser
 FROM alpine:3.9
