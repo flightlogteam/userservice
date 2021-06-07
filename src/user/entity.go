@@ -7,7 +7,7 @@ import (
 
 // User models a db user
 type User struct {
-	ID          string        `gorm:"primaryKey;column:id;size:32"`
+	ID          string        `gorm:"primaryKey;column:id;size:64"`
 	Givenname   string        `gorm:"column:givenname;size:64"`
 	Familyname  string        `gorm:"column:familyname;size:64"`
 	Email       string        `gorm:"column:email;size:320"`
@@ -22,7 +22,7 @@ type User struct {
 
 type Credentials struct {
 	ID           int        `gorm:"primaryKey;column:id"`
-	UserId       string     `gorm:"column:userId;size:32"`
+	UserId       string     `gorm:"column:userId;size:64"`
 	PasswordHash string     `gorm:"column:passwordHash;size:100"`
 	UpdatedAt    *time.Time `gorm:"column:updatedat;type:time"`
 	CreatedAt    *time.Time `gorm:"column:createdat;type:time"`
@@ -47,10 +47,25 @@ func (b *Bit) Scan(src interface{}) error {
 		return nil
 	}
 
+	nt, ok := src.(int64)
+
+	if ok {
+		*b = nt > 0
+		return nil
+	}
+
+	nt32, ok := src.(int32)
+
+	if ok {
+		*b = nt32 > 0
+		return nil
+	}
+
 	str, ok := src.(string)
 	if !ok {
 		return fmt.Errorf("unexpected type for bit: %T", src)
 	}
+
 	switch str {
 	case "\x00":
 		*b = Bit(false)

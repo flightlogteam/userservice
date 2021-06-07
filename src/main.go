@@ -5,9 +5,9 @@ import (
 	"net"
 	"os"
 
+	"github.com/flightlogteam/userservice/grpc/userservice"
 	"github.com/flightlogteam/userservice/src/server"
 	"github.com/flightlogteam/userservice/src/user"
-	"github.com/flightlogteam/userservice/src/usergrpc/userservice"
 
 	"google.golang.org/grpc"
 )

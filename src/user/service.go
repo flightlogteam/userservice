@@ -3,7 +3,8 @@ package user
 import (
 	"fmt"
 	"regexp"
-	"userservice/common"
+
+	"github.com/flightlogteam/userservice/src/common"
 
 	"golang.org/x/crypto/bcrypt"
 )
