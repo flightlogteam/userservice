@@ -1,10 +1,26 @@
 syntax = "proto3";
 
+enum PrivacyLevel {
+  PUBLIC = 0;
+  PROTECTED = 1;
+  PRIVATE = 2;
+}
+
 package usergrpc;
 option go_package="grpc/userservice";
 
 message ActivateUserRequest {
   string userId = 1;
+}
+
+message UserByIdRequest {
+  string userId = 1;
+}
+
+message UserByIdResponse {
+  string userId = 1;
+  PrivacyLevel privacyLevel = 2;
+  bool active = 3;
 }
 
 message ActivateUserResponse {
@@ -62,4 +78,5 @@ service UserService {
   rpc ActivateUser(ActivateUserRequest) returns (ActivateUserResponse) {}
   rpc LoginUser(LoginRequest) returns (LoginResponse) {}
   rpc RegisterUser(CreateUserRequest) returns (CreateUserResponse) {}
+  rpc UserByUserId(UserByIdRequest) returns (UserByIdResponse) {}
 }

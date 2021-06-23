@@ -114,6 +114,8 @@ func (s *GrpcServer) RegisterUser(_ context.Context, createUserRequest *userserv
 	return &response, err
 }
 
+//func (s *GrpcServer) UserByUserId(_ contect.Contet, userByIdRequest *userservice.UserByIdRequest) {}
+
 func mapPrivacyLevel(level userservice.CreateUserRequest_PrivacyLevel) user.PrivacyLevel {
 	switch level {
 	case userservice.CreateUserRequest_PRIVATE:
