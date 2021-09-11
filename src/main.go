@@ -29,6 +29,7 @@ func main() {
 
 	log.Printf("Connected to database %v, with user %v \n", config.database, config.username)
 
+
 	listener, err := net.Listen("tcp", rcpPort)
 
 	if err != nil {
