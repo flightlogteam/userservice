@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"github.com/flightlogteam/userservice/grpc/userservice"
@@ -81,15 +82,12 @@ func (s *GrpcServer) RegisterUser(_ context.Context, createUserRequest *userserv
 	log.Println("Create user request")
 	response := userservice.CreateUserResponse{}
 	usr := user.User{
-		Givenname:   createUserRequest.GetFirstname(),
-		Familyname:  createUserRequest.GetLastname(),
-		Privacy:     mapPrivacyLevel(createUserRequest.GetLevel()),
-		Credentials: make([]user.Credentials, 1),
-		Username:    createUserRequest.GetUsername(),
-		Email:       createUserRequest.GetEmail(),
-	}
-	usr.Credentials[0] = user.Credentials{
-		PasswordHash: createUserRequest.GetPassword(),
+		ID:         createUserRequest.GetId(),
+		Givenname:  createUserRequest.GetFirstname(),
+		Familyname: createUserRequest.GetLastname(),
+		Privacy:    mapPrivacyLevel(createUserRequest.GetLevel()),
+		Username:   createUserRequest.GetUsername(),
+		Email:      createUserRequest.GetEmail(),
 	}
 	_, err := s.userService.Create(&usr)
 
@@ -114,7 +112,18 @@ func (s *GrpcServer) RegisterUser(_ context.Context, createUserRequest *userserv
 	return &response, err
 }
 
-//func (s *GrpcServer) UserByUserId(_ contect.Contet, userByIdRequest *userservice.) {}
+func (s *GrpcServer) UserByUserId(_ context.Context, userByIdRequest *userservice.UserByIdRequest) (*userservice.UserByIdResponse, error) {
+	user, err := s.userService.UserById(userByIdRequest.UserId)
+	if err != nil {
+		return nil, errors.New("No such user")
+	}
+
+	return &userservice.UserByIdResponse{
+		Active:       bool(user.Active),
+		UserId:       user.ID,
+		PrivacyLevel: userservice.PrivacyLevel(user.Privacy),
+	}, nil
+}
 
 func mapPrivacyLevel(level userservice.CreateUserRequest_PrivacyLevel) user.PrivacyLevel {
 	switch level {

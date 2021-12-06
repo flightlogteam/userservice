@@ -5,8 +5,6 @@ import (
 	"regexp"
 
 	"github.com/flightlogteam/userservice/src/common"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
@@ -57,14 +55,6 @@ func (u *UserService) Create(user *User) (string, error) {
 		return "", common.NewUserError(fmt.Sprintf("%s already exists", param), common.VALIDATION_ERROR_TYPE)
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(user.Credentials[0].PasswordHash), bcrypt.DefaultCost)
-
-	if err != nil {
-		return "", common.NewUserError(fmt.Sprintf("Unable to create password hash: %v", err.Error()), common.INTERNAL_SERVER_ERROR_TYPE)
-	}
-
-	user.Credentials[0].PasswordHash = string(hash)
-
 	userId, err := u.repo.Create(user)
 
 	if err != nil {
@@ -95,20 +85,6 @@ func (u *UserService) Login(username string, email string, password string) (*Us
 
 	if user == nil {
 		return nil, common.NewUserError("no such user", common.USER_DOES_NOT_EXISTS_TYPE)
-	}
-
-	credentials := user.Credentials[0]
-
-	// Get user with highest ID
-	for _, c := range user.Credentials {
-		if c.ID > credentials.ID {
-			credentials = c
-		}
-	}
-
-	// Check if the hash is set
-	if err := bcrypt.CompareHashAndPassword([]byte(credentials.PasswordHash), []byte(password)); err != nil {
-		return nil, common.NewUserError("invalid credentials", common.BAD_CREDENTIALS_ERROR)
 	}
 
 	return user, nil

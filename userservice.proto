@@ -48,17 +48,17 @@ message LoginResponse {
 }
 
 message CreateUserRequest {
-  string username = 1;
-  string email = 2;
-  string firstname = 3;
-  string lastname = 4;
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  string firstname = 4;
+  string lastname = 5;
   enum PrivacyLevel {
     PUBLIC = 0;
     PROTECTED = 1;
     PRIVATE = 2;
   }
-  PrivacyLevel level = 5;
-  string password = 6;
+  PrivacyLevel level = 6;
 }
 
 message CreateUserResponse {

@@ -2,9 +2,9 @@ package user
 
 import (
 	"fmt"
+	"log"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -18,7 +18,6 @@ type MariadbRepo struct {
 func (r *MariadbRepo) UserByUsername(username string) (*User, error) {
 	var user User
 	result := r.context.
-		Preload("Credentials").
 		Where("username = ?", username).First(&user)
 	return &user, result.Error
 }
@@ -27,7 +26,6 @@ func (r *MariadbRepo) UserByUsername(username string) (*User, error) {
 func (r *MariadbRepo) UserByEmail(email string) (*User, error) {
 	var user User
 	result := r.context.
-		Preload("Credentials").
 		Where("email = ?", email).First(&user)
 	return &user, result.Error
 }
@@ -35,7 +33,8 @@ func (r *MariadbRepo) UserByEmail(email string) (*User, error) {
 // UserById fetches a user by the userId
 func (r *MariadbRepo) UserById(id string) (*User, error) {
 	var user User
-	result := r.context.First(&user, id)
+	result := r.context.Where("id = ?", id).First(&user)
+	log.Println(user)
 	return &user, result.Error
 }
 
@@ -50,7 +49,7 @@ func NewRepository(username string, password string, hostname string, port strin
 	repo := MariadbRepo{}
 	context, err := gorm.Open(mysql.Open(createConnectionString(username, password, hostname, port, database)), &gorm.Config{})
 
-	context.AutoMigrate(User{}, &Credentials{})
+	context.AutoMigrate(User{})
 	repo.context = context
 	return &repo, err
 }
@@ -71,12 +70,8 @@ func ensureDatabaseExists(username string, password string, hostname string, por
 // Create creates a user
 func (r *MariadbRepo) Create(user *User) (string, error) {
 	timestamp := time.Now()
-	user.ID = uuid.New().String()
 	user.CreatedAt = &timestamp
 	user.UpdatedAt = &timestamp
-
-	user.Credentials[0].CreatedAt = &timestamp
-	user.Credentials[0].UpdatedAt = &timestamp
 
 	result := r.context.Create(user)
 	return user.ID, result.Error

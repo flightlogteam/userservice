@@ -7,30 +7,16 @@ import (
 
 // User models a db user
 type User struct {
-	ID          string        `gorm:"primaryKey;column:id;size:64"`
-	Givenname   string        `gorm:"column:givenname;size:64"`
-	Familyname  string        `gorm:"column:familyname;size:64"`
-	Email       string        `gorm:"column:email;size:320"`
-	Active      Bit           `gorm:"column:active"`
-	Username    string        `gorm:"column:username;size:32"`
-	Credentials []Credentials `gorm:"foreignKey:userId"`
-	Privacy     PrivacyLevel  `gorm:"column:privacylevel"`
-	UpdatedAt   *time.Time    `gorm:"column:updatedat;type:time"`
-	CreatedAt   *time.Time    `gorm:"column:createdat;type:time"`
-	DeletedAt   *time.Time    `gorm:"column:deletedat;type:time"`
-}
-
-type Credentials struct {
-	ID           int        `gorm:"primaryKey;column:id"`
-	UserId       string     `gorm:"column:userId;size:64"`
-	PasswordHash string     `gorm:"column:passwordHash;size:100"`
-	UpdatedAt    *time.Time `gorm:"column:updatedat;type:time"`
-	CreatedAt    *time.Time `gorm:"column:createdat;type:time"`
-	DeletedAt    *time.Time `gorm:"column:deletedat;type:time"`
-}
-
-func (Credentials) TableName() string {
-	return "Credentials"
+	ID         string       `gorm:"primaryKey;column:id;size:64"`
+	Givenname  string       `gorm:"column:givenname;size:64"`
+	Familyname string       `gorm:"column:familyname;size:64"`
+	Email      string       `gorm:"column:email;size:320"`
+	Active     Bit          `gorm:"column:active"`
+	Username   string       `gorm:"column:username;size:32"`
+	Privacy    PrivacyLevel `gorm:"column:privacylevel"`
+	UpdatedAt  *time.Time   `gorm:"column:updatedat;type:time"`
+	CreatedAt  *time.Time   `gorm:"column:createdat;type:time"`
+	DeletedAt  *time.Time   `gorm:"column:deletedat;type:time"`
 }
 
 func (User) TableName() string {
