@@ -2,21 +2,23 @@ package user
 
 import (
 	"fmt"
+	"github.com/flightlogteam/userservice/src/device"
 	"time"
 )
 
 // User models a db user
 type User struct {
-	ID         string       `gorm:"primaryKey;column:id;size:64"`
-	Givenname  string       `gorm:"column:givenname;size:64"`
-	Familyname string       `gorm:"column:familyname;size:64"`
-	Email      string       `gorm:"column:email;size:320"`
-	Active     Bit          `gorm:"column:active"`
-	Username   string       `gorm:"column:username;size:32"`
-	Privacy    PrivacyLevel `gorm:"column:privacylevel"`
-	UpdatedAt  *time.Time   `gorm:"column:updatedat;type:time"`
-	CreatedAt  *time.Time   `gorm:"column:createdat;type:time"`
-	DeletedAt  *time.Time   `gorm:"column:deletedat;type:time"`
+	ID            string                `gorm:"primaryKey;column:id;size:64"`
+	Givenname     string                `gorm:"column:givenname;size:64"`
+	Familyname    string                `gorm:"column:familyname;size:64"`
+	Email         string                `gorm:"column:email;size:320"`
+	Active        Bit                   `gorm:"column:active"`
+	Username      string                `gorm:"column:username;size:32"`
+	Privacy       PrivacyLevel          `gorm:"column:privacylevel"`
+	UpdatedAt     *time.Time            `gorm:"column:updatedat;type:time"`
+	CreatedAt     *time.Time            `gorm:"column:createdat;type:time"`
+	DeletedAt     *time.Time            `gorm:"column:deletedat;type:time"`
+	FlyingDevices []device.FlyingDevice `gorm:"foreignKey:userId"`
 }
 
 func (User) TableName() string {
