@@ -4,9 +4,15 @@ go 1.14
 
 require (
 	github.com/flightlogteam/userservice/grpc v1.1.0
-	github.com/google/uuid v1.1.3
-	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
+	github.com/gorilla/handlers v1.5.1
+	github.com/gorilla/mux v1.8.0
+	github.com/klyngen/jsend v0.0.0-20190716184451-284cbade049f
+	github.com/pkg/errors v0.9.1
+	github.com/stretchr/testify v1.7.0
 	google.golang.org/grpc v1.38.0
-	gorm.io/driver/mysql v1.0.3
-	gorm.io/gorm v1.20.9
+	gorm.io/driver/mysql v1.3.5
+	gorm.io/driver/postgres v1.3.8 // indirect
+	gorm.io/driver/sqlite v1.3.6
+	gorm.io/driver/sqlserver v1.3.2 // indirect
+	gorm.io/gorm v1.23.8
 )
