@@ -72,6 +72,14 @@ message CreateUserResponse {
   string errorMessage = 2;
 }
 
+message FlyingDeviceExsistsRequest {
+  string deviceId = 1;
+}
+
+message FlyingDeviceExsistsResponse {
+  bool exsists = 1;
+}
+
 
 
 service UserService {
@@ -79,4 +87,5 @@ service UserService {
   rpc LoginUser(LoginRequest) returns (LoginResponse) {}
   rpc RegisterUser(CreateUserRequest) returns (CreateUserResponse) {}
   rpc UserByUserId(UserByIdRequest) returns (UserByIdResponse) {}
+  rpc FlyingDeviceExsists(FlyingDeviceExsistsRequest) returns (FlyingDeviceExsistsResponse) {}
 }
