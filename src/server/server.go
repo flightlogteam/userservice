@@ -7,13 +7,15 @@ import (
 
 	"github.com/flightlogteam/userservice/grpc/userservice"
 	"github.com/flightlogteam/userservice/src/common"
+	"github.com/flightlogteam/userservice/src/device"
 	"github.com/flightlogteam/userservice/src/user"
 )
 
 // NewGrpcServer creates a new GrpcServer instance
-func NewGrpcServer(userservice user.Service) GrpcServer {
+func NewGrpcServer(userservice user.Service, deviceService device.FlyingDeviceService) GrpcServer {
 	return GrpcServer{
-		userService: userservice,
+		userService:   userservice,
+		deviceService: deviceService,
 	}
 }
 
@@ -21,7 +23,8 @@ func NewGrpcServer(userservice user.Service) GrpcServer {
 // it is in many ways an adapter to the core of the architecture
 type GrpcServer struct {
 	userservice.UnimplementedUserServiceServer
-	userService user.Service
+	userService   user.Service
+	deviceService device.FlyingDeviceService
 }
 
 // ActivateUser activates a user in the database after a user has clicked activation link
@@ -122,6 +125,17 @@ func (s *GrpcServer) UserByUserId(_ context.Context, userByIdRequest *userservic
 		Active:       bool(user.Active),
 		UserId:       user.ID,
 		PrivacyLevel: userservice.PrivacyLevel(user.Privacy),
+	}, nil
+}
+
+func (s *GrpcServer) FlyingDeviceExsists(_ context.Context, in *userservice.FlyingDeviceExsistsRequest) (*userservice.FlyingDeviceExsistsResponse, error) {
+	device, err := s.deviceService.GetDeviceByID(in.DeviceId)
+	if err != nil {
+		return nil, errors.New("No such device")
+	}
+
+	return &userservice.FlyingDeviceExsistsResponse{
+		Exsists: device != nil,
 	}, nil
 }
 
