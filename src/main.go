@@ -48,12 +48,12 @@ func main() {
 
 	userService := user.NewUserService(repo)
 
-	userserver := server.NewGrpcServer(userService)
-	grpcServer := grpc.NewServer()
-	userservice.RegisterUserServiceServer(grpcServer, &userserver)
-
 	deviceRepo := device.NewRepository(dbContext)
 	deviceService := device.NewDeviceService(deviceRepo)
+
+	userserver := server.NewGrpcServer(userService, deviceService)
+	grpcServer := grpc.NewServer()
+	userservice.RegisterUserServiceServer(grpcServer, &userserver)
 
 	api := presentation.NewApi(userService, deviceService)
 

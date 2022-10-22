@@ -53,3 +53,7 @@ func (s *DeviceService) GetDeviceByUser(userId string) ([]FlyingDevice, error) {
 
 	return devices, nil
 }
+
+func (s *DeviceService) GetDeviceByID(deviceId string) (*FlyingDevice, error) {
+	return s.deviceRepo.GetDeviceByID(deviceId)
+}

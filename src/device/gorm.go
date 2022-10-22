@@ -41,3 +41,11 @@ func (r *FlyingDeviceGormRepository) GetDeviceByUser(userId string) ([]FlyingDev
 
 	return devices, result.Error
 }
+
+func (r *FlyingDeviceGormRepository) GetDeviceByID(deviceId string) (*FlyingDevice, error) {
+	var device FlyingDevice
+
+	result := r.context.Where("id = ?", deviceId).Find(&device)
+
+	return &device, result.Error
+}

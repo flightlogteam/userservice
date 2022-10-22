@@ -22,6 +22,7 @@ type UserServiceClient interface {
 	LoginUser(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	RegisterUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	UserByUserId(ctx context.Context, in *UserByIdRequest, opts ...grpc.CallOption) (*UserByIdResponse, error)
+	FlyingDeviceExsists(ctx context.Context, in *FlyingDeviceExsistsRequest, opts ...grpc.CallOption) (*FlyingDeviceExsistsResponse, error)
 }
 
 type userServiceClient struct {
@@ -68,6 +69,15 @@ func (c *userServiceClient) UserByUserId(ctx context.Context, in *UserByIdReques
 	return out, nil
 }
 
+func (c *userServiceClient) FlyingDeviceExsists(ctx context.Context, in *FlyingDeviceExsistsRequest, opts ...grpc.CallOption) (*FlyingDeviceExsistsResponse, error) {
+	out := new(FlyingDeviceExsistsResponse)
+	err := c.cc.Invoke(ctx, "/usergrpc.UserService/FlyingDeviceExsists", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -76,6 +86,7 @@ type UserServiceServer interface {
 	LoginUser(context.Context, *LoginRequest) (*LoginResponse, error)
 	RegisterUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	UserByUserId(context.Context, *UserByIdRequest) (*UserByIdResponse, error)
+	FlyingDeviceExsists(context.Context, *FlyingDeviceExsistsRequest) (*FlyingDeviceExsistsResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -94,6 +105,9 @@ func (UnimplementedUserServiceServer) RegisterUser(context.Context, *CreateUserR
 }
 func (UnimplementedUserServiceServer) UserByUserId(context.Context, *UserByIdRequest) (*UserByIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserByUserId not implemented")
+}
+func (UnimplementedUserServiceServer) FlyingDeviceExsists(context.Context, *FlyingDeviceExsistsRequest) (*FlyingDeviceExsistsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FlyingDeviceExsists not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -180,6 +194,24 @@ func _UserService_UserByUserId_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_FlyingDeviceExsists_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FlyingDeviceExsistsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).FlyingDeviceExsists(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/usergrpc.UserService/FlyingDeviceExsists",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).FlyingDeviceExsists(ctx, req.(*FlyingDeviceExsistsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -202,6 +234,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UserByUserId",
 			Handler:    _UserService_UserByUserId_Handler,
+		},
+		{
+			MethodName: "FlyingDeviceExsists",
+			Handler:    _UserService_FlyingDeviceExsists_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

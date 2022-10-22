@@ -10,6 +10,7 @@ type Writer interface {
 type Reader interface {
 	// GetDeviceByUser get all flying devices by userID
 	GetDeviceByUser(userId string) ([]FlyingDevice, error)
+	GetDeviceByID(deviceId string) (*FlyingDevice, error)
 }
 
 type FlyingDeviceRepository interface {
